@@ -7,6 +7,9 @@
 #' Station: Hyannis
 #'--------------------------------------
 
+# TODO: Simple means are calculated by month, not accounting for missing data.
+#       Consider options: impute missing data, use only days with complete data, other?
+
 library(readr) # for reading in files
 library(lubridate) # for date time formats
 library(dplyr) # for data manipulation and transformation

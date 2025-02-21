@@ -10,6 +10,9 @@
 #' Owned and maintained by NERACOOS
 #'--------------------------------------
 
+# TODO: Simple means are calculated by month, not accounting for missing data.
+#       Consider options: impute missing data, use only days with complete data, other?
+
 library(readr) # for reading in files
 library(lubridate) # for date time formats
 library(dplyr) # for data manipulation and transformation
@@ -30,7 +33,10 @@ info_A01_aanderaa_hist <- rerddap::info("A01_aanderaa_hist",
 # Get time, current speed, current direction, and water temp data
 A01_aanderaa_hist <- 
   tabledap(info_A01_aanderaa_hist,
-           'cat4FlagPrimary=0', # query limited to "quality_good" observations
+           # query limited to "quality_good" observations where qc flags = 0
+           'current_speed_qc=0',
+           'current_direction_qc=0',
+           'temperature_qc=0',
            fields = c("time", "current_speed", "current_direction", "temperature")
   )
 
@@ -41,10 +47,17 @@ A01_aanderaa_hist <-
 # skimr::skim(A01_aanderaa_hist)
 
 # Clean imported data
+A01_aanderaa_hist <- A01_aanderaa_hist |> 
+  mutate(
+    time = ymd_hms(time, tz = "UTC"), # convert time column to date time
+    date = as.Date(time), # create date column based on time column
+    across(c(current_speed, current_direction, temperature), as.numeric) # convert air temp to numeric
+  )
 
 # Calculate daily mean and high values to reduce size of data sets
 
 
+# TODO: What additional A01 buoy data is needed for analysis?
 # ---- 	 ----
 
 
