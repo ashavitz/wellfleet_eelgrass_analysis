@@ -56,4 +56,3 @@ ggplot(data = hyannis_climate_data,
   facet_wrap(~MonthName) +
   labs(title = "Air Temperature Change 1893 - 2025", 
        y = "Temperature (°F)", color = "Temperature Variables")
-
