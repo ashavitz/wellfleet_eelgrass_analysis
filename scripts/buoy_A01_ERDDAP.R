@@ -51,18 +51,72 @@ A01_aanderaa_hist <- A01_aanderaa_hist |>
   mutate(
     time = ymd_hms(time, tz = "UTC"), # convert time column to date time
     date = as.Date(time), # create date column based on time column
-    across(c(current_speed, current_direction, temperature), as.numeric) # convert air temp to numeric
+    across(c(current_speed, current_direction, temperature), as.numeric) # convert to numeric
   )
 
 # Calculate daily mean and high values to reduce size of data sets
 
 
 # TODO: What additional A01 buoy data is needed for analysis?
-# ---- 	 ----
+
+# ---- A01 Directional Waves ----
+# TODO: There are many variables in this data set. What is needed for analysis?
+
+# Get information about the A01_waves_mstrain_all data set
+info_A01_wave_dir <- rerddap::info("A01_waves_mstrain_all",
+                                        url = "neracoos.org/erddap")
+
+# Get time, significant wave height, dominant wave period, mean wave direction, and swell wave height data
+A01_wave_dir <- 
+  tabledap(info_A01_wave_dir,
+           # query limited to "quality_good" observations where qc flags = 0
+           'significant_wave_height_3_qc=0',
+           'dominant_wave_period_3_qc=0',
+           'mean_wave_direction_3_qc=0',
+           'swell_wave_height_3_qc=0',
+           fields = c("time",
+                      "significant_wave_height_3",
+                      "dominant_wave_period_3",
+                      "mean_wave_direction_3",
+                      "swell_wave_height_3")
+           )
+
+# Clean imported data
+A01_wave_dir <- A01_wave_dir |> 
+  mutate(
+    time = ymd_hms(time, tz = "UTC"), # convert time column to date time
+    date = as.Date(time), # create date column based on time column
+    across(c(significant_wave_height_3,
+             dominant_wave_period_3,
+             mean_wave_direction_3,
+             swell_wave_height_3), as.numeric) # convert to numeric
+  )
 
 
+# ---- A01 Accelerometer - Waves ----
 
+# Get information about the A01_accelerometer_all data set
+info_A01_wave_acc <- rerddap::info("A01_accelerometer_all",
+                                        url = "neracoos.org/erddap")
 
+# Get time, significant wave height, and dominant wave period data
+A01_wave_acc <- 
+  tabledap(info_A01_wave_acc,
+           # query limited to "quality_good" observations where qc flags = 0
+           'significant_wave_height_qc=0',
+           'dominant_wave_period_qc=0',
+           fields = c("time", "significant_wave_height", "dominant_wave_period")
+  )
 
-# ---- 	 ----
+# Clean imported data
+A01_wave_acc <- A01_wave_acc |> 
+  mutate(
+    time = ymd_hms(time, tz = "UTC"), # convert time column to date time
+    date = as.Date(time), # create date column based on time column
+    across(c(significant_wave_height, dominant_wave_period), as.numeric) # convert to numeric
+  )
+
+# ---- 	----
+
+# ----  ----
 
